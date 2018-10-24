@@ -1,3 +1,4 @@
+import collections
 '''import sys
 
 if len(sys.argv) != 2:
@@ -69,19 +70,33 @@ class Graph:
                 neighbour = self.vertices[i].adjVertices[j]
                 weight = self.edges[(self.vertices[i], neighbour)]
                 print(neighbour.name + "(" + str(weight) + ")", end="")
-                if(j != adjVerticesCount -1):
+                if j != adjVerticesCount -1:
                     print(", ", end="")
             print()
 
+
+
+    def displayStatus(self):
+        print("The status of the vertices are:-")
+
+        for i in range(self.vertexCount):
+            print(self.vertices[i].name, " : ", self.vertices[i].status)
+
+
+    def reset(self):
+        for i in range(self.vertexCount):
+            self.vertices[i].status = None
+
+
+def DFS(graph, source, id=0, dfsTreeNum=1):       # id is used to identify the source/parent node from where DFS started
+    if id == 0 and dfsTreeNum == 1:
+        graph.reset()
         print()
-
-
-def DFS(graph, source, id=0, dfsTreeNum=1):       # id is used to identify the source/parent node from where DFS started.
     if id == 0:
         print("DFS Tree number", dfsTreeNum)
 
     source.status = "Visited"
-    print(source.name)
+    print(source.name, "  ", end="")
     for neighbour in source.adjVertices:
         if neighbour.status != "Visited":
             DFS(graph, neighbour, 1, dfsTreeNum)
@@ -91,8 +106,46 @@ def DFS(graph, source, id=0, dfsTreeNum=1):       # id is used to identify the s
             if vertex.status != "Visited":
                 print()         # adding a newline for a better looking output
                 DFS(graph, vertex, dfsTreeNum=dfsTreeNum+1)
+                break
+        if dfsTreeNum == 1:
+            print()
+
+
+def BFS(graph, source, bfsTreeNum=1):
+    if bfsTreeNum == 1:
+        graph.reset()
+        print()
+
+    Q = collections.deque()
+    Q.append(source)
+    source.status = "Added to Queue"
+
+    print("BFS Tree number", bfsTreeNum)
+    while len(Q) > 0:
+        vertex = Q.popleft()
+        vertex.status = "Visited"
+        print(vertex.name, "  ", end="")
+
+        for neighbour in vertex.adjVertices:
+            if neighbour.status is None:
+                neighbour.status = "Added to Queue"
+                Q.append(neighbour)
+
+    for vertex in graph.vertices:
+        if vertex.status != "Visited":
+            print()
+            BFS(graph, vertex, bfsTreeNum + 1)
+
+    if bfsTreeNum == 1:
+        print()
+
+
+def tSort(graph, source):
+    pass
 
 
 g = Graph(7)
 g.display()
 DFS(g, g.vertices[4])
+BFS(g, g.vertices[4])
+DFS(g, g.vertices[0])
