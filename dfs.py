@@ -1,4 +1,5 @@
 import collections
+import heapq
 '''import sys
 
 if len(sys.argv) != 2:
@@ -17,9 +18,18 @@ class Vertex:
         Vertex.count += 1
         self.adjVertices = []
         self.status = None
+        self.indegree = 0
 
     def __del__(self):
         Vertex.count -= 1
+
+
+    def __lt__(self, other):
+        return self.indegree < other.indegree
+
+
+    def __cmp__(self, other):
+        return self.indegree < other.indegree
 
 
 class Edge:
@@ -55,6 +65,7 @@ class Graph:
 
             for j in range(adjVerticesCount):
                 neighbour = self.vertices[int(line[j*2]) - 1]
+                neighbour.indegree += 1
                 weight = int(line[j*2 + 1])
                 self.vertices[i].adjVertices.append(neighbour)
                 self.edges[(self.vertices[i], neighbour)] = weight
@@ -140,12 +151,33 @@ def BFS(graph, source, bfsTreeNum=1):
         print()
 
 
-def tSort(graph, source):
-    pass
+def topologicalSort(graph):
+    graph.reset()
+    topologicalNum = 0
+
+    Q = collections.deque()
+    for vertex in graph.vertices:
+        if vertex.indegree == 0:
+            Q.append(vertex)
+            vertex.status = "Added to Queue"
+
+    while len(Q) > 0:
+        vertex = Q.popleft()
+        topologicalNum += 1
+        print(vertex.name)
+        vertex.status = "Visited"
+
+        for neighbour in vertex.adjVertices:
+            if neighbour.status is None:
+                neighbour.indegree -= 1
+                if neighbour.indegree == 0:
+                    Q.append(neighbour)
+                    neighbour.status = "Added to queue"
+
+    if topologicalNum != graph.vertexCount:
+        print("There was a cycle!")
 
 
 g = Graph(7)
 g.display()
-DFS(g, g.vertices[4])
-BFS(g, g.vertices[4])
-DFS(g, g.vertices[0])
+topologicalSort(g)
