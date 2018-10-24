@@ -1,11 +1,12 @@
-import sys
+'''import sys
 
 if len(sys.argv) != 2:
     print("Usage:-\npython dfs.py <OUT-FILE>\n")
     sys.exit(1)
 
+OUT_FILE = sys.argv[1]'''
 INP_FILE = "graph.dat"
-OUT_FILE = sys.argv[1]
+
 
 class Vertex:
     count = 0
@@ -14,6 +15,7 @@ class Vertex:
         self.name = chr(ord('A') + Vertex.count)
         Vertex.count += 1
         self.adjVertices = []
+        self.status = None
 
     def __del__(self):
         Vertex.count -= 1
@@ -57,18 +59,40 @@ class Graph:
                 self.edges[(self.vertices[i], neighbour)] = weight
 
     def display(self):
-        print("The graph is:-\n")
+        print("The graph is:-")
 
         for i in range(self.vertexCount):
-            print("Vertex " + self.vertices[i].name, " --> ", end="")
+            print("Vertex " + self.vertices[i].name, " -->  ", end="")
             adjVerticesCount = len(self.vertices[i].adjVertices)
 
             for j in range(adjVerticesCount):
                 neighbour = self.vertices[i].adjVertices[j]
                 weight = self.edges[(self.vertices[i], neighbour)]
-                print(neighbour.name + "(" + str(weight) + "), ", end="")
-            print("\n")
+                print(neighbour.name + "(" + str(weight) + ")", end="")
+                if(j != adjVerticesCount -1):
+                    print(", ", end="")
+            print()
+
+        print()
+
+
+def DFS(graph, source, id=0, dfsTreeNum=1):       # id is used to identify the source/parent node from where DFS started.
+    if id == 0:
+        print("DFS Tree number", dfsTreeNum)
+
+    source.status = "Visited"
+    print(source.name)
+    for neighbour in source.adjVertices:
+        if neighbour.status != "Visited":
+            DFS(graph, neighbour, 1, dfsTreeNum)
+
+    if id == 0:
+        for vertex in graph.vertices:
+            if vertex.status != "Visited":
+                print()         # adding a newline for a better looking output
+                DFS(graph, vertex, dfsTreeNum=dfsTreeNum+1)
 
 
 g = Graph(7)
 g.display()
+DFS(g, g.vertices[4])
